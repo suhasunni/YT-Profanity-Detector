@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By 
+from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
 import os
 import time
@@ -13,21 +14,16 @@ load_dotenv()
 class ScraperBot:
     def __init__(self, video_url):
         self.video_url = video_url
+        options = Options()
+        options.add_argument("headless")
         #add path to downloaded chromedriver in '.env' file
-        self.driver = webdriver.Chrome(service=Service(executable_path=os.getenv('PATH_TO_DRIVER')))
+        self.driver = webdriver.Chrome(service=Service(executable_path=os.getenv('PATH_TO_DRIVER')), options=options)
     
     def createBot(self):
         self.driver.get(self.video_url)
 
     def closeBot(self):
         self.driver.close()
-
-    def getVideoName(self):
-        #WRITE
-        try:
-            return WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//div[@id="above-the-fold"]'))).text
-        except:
-            return 'Unknown'
 
     def scrapeTranscript(self):
         #click 'more' button to expand description box
@@ -67,24 +63,23 @@ class ScraperBot:
         
         return round((curse_word_count/total_word_count)*100,2)  
                     
-    def exportTranscript(self, transcript):
+    def exportTranscript(self, transcript, file_name):
         #write full transcript to file
-        #video_title = self.getVideoName()
-        video_title = 'Drip Too Hard'
         
-        with open(f'{video_title}.txt', 'w') as file:
-            file.write(f'Transcript for {video_title}:\nAll curse words are replaced with [__].\n')
+        with open(f'{file_name}.txt', 'w') as file:
+            file.write(f'Transcript (Curse words replaced with [__]):\n')
             file.write(transcript)
+        
+        print('Transcript exported to device.')
 
 
 #TEST SCRIPTS
-test = ScraperBot('https://www.youtube.com/watch?v=_YzD9KW82sk')
+test = ScraperBot('https://www.youtube.com/watch?v=lFwwo0W5Ugg')
 test.createBot()
-print(test.getVideoName())
 video_transcript = test.scrapeTranscript()
 if video_transcript:
-    test.checkProfanity(video_transcript)
-test.exportTranscript(video_transcript)
+    print(test.checkProfanity(video_transcript))
+test.exportTranscript(video_transcript, 'Grading Flags')
 test.closeBot()
 
 
