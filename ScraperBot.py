@@ -22,6 +22,13 @@ class ScraperBot:
     def closeBot(self):
         self.driver.close()
 
+    def getVideoName(self):
+        #WRITE
+        try:
+            return WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//div[@id="above-the-fold"]'))).text
+        except:
+            return 'Unknown'
+
     def scrapeTranscript(self):
         #click 'more' button to expand description box
         more_btn = WebDriverWait(self.driver, 100).until(EC.presence_of_element_located((By.XPATH, '//tp-yt-paper-button[@id="expand"]')))
@@ -58,19 +65,26 @@ class ScraperBot:
                     curse_word_count += 1
                 total_word_count +=1
         
-        print(transcript)
-        print('Curse Words: ', curse_word_count, ' Total Words: ', total_word_count)
+        return round((curse_word_count/total_word_count)*100,2)  
                     
+    def exportTranscript(self, transcript):
+        #write full transcript to file
+        #video_title = self.getVideoName()
+        video_title = 'Drip Too Hard'
+        
+        with open(f'{video_title}.txt', 'w') as file:
+            file.write(f'Transcript for {video_title}:\nAll curse words are replaced with [__].\n')
+            file.write(transcript)
 
 
-
-
-
+#TEST SCRIPTS
 test = ScraperBot('https://www.youtube.com/watch?v=_YzD9KW82sk')
 test.createBot()
+print(test.getVideoName())
 video_transcript = test.scrapeTranscript()
 if video_transcript:
     test.checkProfanity(video_transcript)
+test.exportTranscript(video_transcript)
 test.closeBot()
 
 
