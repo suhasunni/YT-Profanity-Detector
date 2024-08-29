@@ -6,7 +6,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from dotenv import load_dotenv
 import os
-import time
 import re
 
 load_dotenv()
@@ -60,12 +59,10 @@ class ScraperBot:
                 if word == '[__]':
                     curse_word_count += 1
                 total_word_count +=1
-        
         return round((curse_word_count/total_word_count)*100,2)  
                     
     def exportTranscript(self, transcript, file_name):
         #write full transcript to file
-        
         with open(f'{file_name}.txt', 'w') as file:
             file.write(f'Transcript (Curse words replaced with [__]):\n')
             file.write(transcript)
@@ -73,14 +70,16 @@ class ScraperBot:
         print('Transcript exported to device.')
 
 
-#TEST SCRIPTS
-test = ScraperBot('https://www.youtube.com/watch?v=lFwwo0W5Ugg')
-test.createBot()
-video_transcript = test.scrapeTranscript()
-if video_transcript:
-    print(test.checkProfanity(video_transcript))
-test.exportTranscript(video_transcript, 'Grading Flags')
-test.closeBot()
 
-
-
+#User Interaction
+response = input('Enter video URL: ')
+bot = ScraperBot(response)
+bot.createBot()
+transcript = bot.scrapeTranscript()
+path = input('What would you like to do?\n(1) Get Profanity Score\n(2) Export Video Transcript\n')
+if path == '1':
+    print('The percentage of curse words in this video is ' + str(bot.checkProfanity(transcript)) + '%.')
+else:
+    video_name = input('Enter Video Name:')
+    bot.exportTranscript(transcript, video_name)
+bot.closeBot()
