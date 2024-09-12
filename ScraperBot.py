@@ -48,6 +48,8 @@ class ScraperBot:
         return transcript
 
     def checkProfanity(self, transcript):
+        if not transcript:
+            return 'Error fetching transcript. Try again.'
         #check transcript for profanity
         curse_word_count = 0
         total_word_count = 0
