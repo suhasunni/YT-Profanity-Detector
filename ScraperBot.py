@@ -14,7 +14,7 @@ class ScraperBot:
     def __init__(self, video_url):
         self.video_url = video_url
         options = Options()
-        options.add_argument("headless")
+        #options.add_argument("headless")
         #add path to downloaded chromedriver in '.env' file
         self.driver = webdriver.Chrome(service=Service(executable_path=os.getenv('PATH_TO_DRIVER')), options=options)
     
@@ -78,10 +78,14 @@ response = input('Enter video URL: ')
 bot = ScraperBot(response)
 bot.createBot()
 transcript = bot.scrapeTranscript()
-path = input('What would you like to do?\n(1) Get Profanity Score\n(2) Export Video Transcript\n')
-if path == '1':
-    print('The percentage of curse words in this video is ' + str(bot.checkProfanity(transcript)) + '%.')
-else:
-    video_name = input('Enter Video Name:')
-    bot.exportTranscript(transcript, video_name)
 bot.closeBot()
+if not transcript:
+    print('Transcript could not be fetched.')
+else:
+        
+    path = input('What would you like to do?\n(1) Get Profanity Score\n(2) Export Video Transcript\n')
+    if path == '1':
+        print('The percentage of curse words in this video is ' + str(bot.checkProfanity(transcript)) + '%.')
+    else:
+        video_name = input('Enter Video Name:')
+        bot.exportTranscript(transcript, video_name)
